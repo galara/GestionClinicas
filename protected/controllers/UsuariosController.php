@@ -1,16 +1,21 @@
 <?php
 
-class PacientesController extends Controller {
+class UsuariosController extends Controller {
 
+    /**
+     * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+     * using two-column layout. See 'protected/views/layouts/column2.php'.
+     */
+    public $layout = '//layouts/column2';
     public $mensaje;
-
+    public $selectedItem = 'mantenedores';
     /**
      * @return array action filters
      */
     public function filters() {
         return array(
             'accessControl', // perform access control for CRUD operations
-                //'postOnly + delete', // we only allow deletion via POST request
+            'postOnly + delete', // we only allow deletion via POST request
         );
     }
 
@@ -22,7 +27,7 @@ class PacientesController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'detalles', 'crear', 'editar', 'admin', 'eliminar', 'buscar', 'displayImage'),
+                'actions' => array('index', 'detalles', 'crear', 'editar'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -54,39 +59,24 @@ class PacientesController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
     public function actionCrear() {
-        $model = new Pacientes;
+        $model = new Usuarios;
 
         // Uncomment the following line if AJAX validation is needed
-        $this->performAjaxValidation($model);
+        // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Pacientes'])) {
-            $model->attributes = $_POST['Pacientes'];
-
-            if (!empty($_FILES['foto'])) {
-                $file = CUploadedFile::getInstance($model, 'foto');
-                $fp = fopen($file->tempName, 'r');
-                $content = fread($fp, filesize($file->tempName));
-                fclose($fp);
-                $model->foto = $content;
+        if (isset($_POST['Usuarios'])) {
+            $model->attributes = $_POST['Usuarios'];
+            if ($model->save()){
+                $this->mensaje = 'El usuario ' . $model->rut . ' ha sido registrado en el sistema.';
+                $this->forward('index');
             }
-
-            if ($model->save())
-                $this->redirect(array('detalles', 'id' => $model->rut));
         }
 
         $this->render('crear', array(
             'model' => $model,
         ));
     }
-    
-    public function actionDisplayImage($id){
-        
-        $model = Pacientes::model()->findByPk($id);
-        
-        header('Content-Type: jpg');
-        echo $model->foto;
-        
-    }
+
     /**
      * Updates a particular model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -98,12 +88,12 @@ class PacientesController extends Controller {
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Pacientes'])) {
-            $model->attributes = $_POST['Pacientes'];
-            $this->mensaje = 'El paciente rut ' . $model->rut . ' ha sido editado correctamente';
-            if ($model->save())
-            //$this->redirect(array('index', 'id' => $model->rut));
+        if (isset($_POST['Usuarios'])) {
+            $model->attributes = $_POST['Usuarios'];
+            if ($model->save()){
+                $this->mensaje = 'Los datos del usuario ' . $model->rut . ' han sido editados.';
                 $this->forward('index');
+            }
         }
 
         $this->render('editar', array(
@@ -116,39 +106,21 @@ class PacientesController extends Controller {
      * If deletion is successful, the browser will be redirected to the 'admin' page.
      * @param integer $id the ID of the model to be deleted
      */
-    public function actionEliminar($id) {
+    public function actionDelete($id) {
+        $this->loadModel($id)->delete();
 
-        $affected = Pacientes::model()->deleteByPk($id);
-
-        if ($affected > 0) {
-            $this->mensaje = 'El paciente ha sido eliminado exitosamente';
-            $this->forward('index');
-        }
+        // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+        if (!isset($_GET['ajax']))
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
     }
 
     /**
      * Lists all models.
      */
     public function actionIndex() {
-
         $criteria = new CDbCriteria();
-        $count = Pacientes::model()->count($criteria);
+        $count = Profesionales::model()->count($criteria);
         $pages = new CPagination($count);
-
-        // results per page
-        $pages->pageSize = 5;
-        $pages->applyLimit($criteria);
-
-        $pacientes = Pacientes::model()->findAll($criteria);
-
-        $this->render('index', array('pacientes' => $pacientes,
-            'pages' => $pages,
-        ));
-    }
-
-    public function actionBuscar() {
-
-        $criteria = new CDbCriteria();
 
         if (isset($_GET['palabraClave'])) {
             $q = $_GET['palabraClave'];
@@ -157,16 +129,13 @@ class PacientesController extends Controller {
             $criteria->compare('rut', $q, true, 'OR');
         }
 
-        $count = Pacientes::model()->count($criteria);
-        $pages = new CPagination($count);
-
         // results per page
         $pages->pageSize = 5;
         $pages->applyLimit($criteria);
 
-        $pacientes = Pacientes::model()->findAll($criteria);
+        $usuarios = Usuarios::model()->findAll($criteria);
 
-        $this->render('index', array('pacientes' => $pacientes,
+        $this->render('index', array('usuarios' => $usuarios,
             'pages' => $pages,
         ));
     }
@@ -175,10 +144,10 @@ class PacientesController extends Controller {
      * Manages all models.
      */
     public function actionAdmin() {
-        $model = new Pacientes('search');
+        $model = new Usuarios('search');
         $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Pacientes']))
-            $model->attributes = $_GET['Pacientes'];
+        if (isset($_GET['Usuarios']))
+            $model->attributes = $_GET['Usuarios'];
 
         $this->render('admin', array(
             'model' => $model,
@@ -189,11 +158,11 @@ class PacientesController extends Controller {
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
-     * @return Pacientes the loaded model
+     * @return Usuarios the loaded model
      * @throws CHttpException
      */
     public function loadModel($id) {
-        $model = Pacientes::model()->findByPk($id);
+        $model = Usuarios::model()->findByPk($id);
         if ($model === null)
             throw new CHttpException(404, 'The requested page does not exist.');
         return $model;
@@ -201,10 +170,10 @@ class PacientesController extends Controller {
 
     /**
      * Performs the AJAX validation.
-     * @param Pacientes $model the model to be validated
+     * @param Usuarios $model the model to be validated
      */
     protected function performAjaxValidation($model) {
-        if (isset($_POST['ajax']) && $_POST['ajax'] === 'pacientes-form') {
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'usuarios-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }

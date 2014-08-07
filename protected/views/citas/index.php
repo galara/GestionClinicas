@@ -46,13 +46,6 @@ $this->breadcrumbs = array(
         </div>
     </div>
 </div>	
-<!-- activa un checkbox para alternar entre detalles en modal o en pagina
-<div class="checkbox">
-    <label>
-        <input type="checkbox" value="#events-modal" id="events-in-modal"> Abrir eventos en una ventana modal
-    </label>
-</div>
--->
 <div>
     <label>
         Haga click sobre una cita para ver sus detalles

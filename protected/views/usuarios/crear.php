@@ -1,27 +1,28 @@
 <?php
-/* @var $this CitasController */
-/* @var $model Citas */
+/* @var $this UsuariosController */
+/* @var $model Usuarios */
+
 Yii::app()->params['moduloActivo'] = $this->selectedItem;
 
 $this->breadcrumbs = array(
-    'Citas' => array('index'),
-    'Agendar Cita',
+    'Usuarios' => array('index'),
+    'Nuevo Usuario',
 );
 ?>
 
-<div class="col-md-12">
-    <h1>Agendar Cita</h1>
-    <hr>
-</div>
+<h1>Nuevo Usuario</h1>
+<hr>
 <div class="row">
-    <?php $this->renderPartial('_form', array('model' => $model)); ?>
+    <div class="col-md-9">
+        <?php $this->renderPartial('_form', array('model' => $model)); ?>
+    </div>
     <div class="col-md-3">
         <div class="panel panel-primary">
             <div class="panel-heading">Operaciones</div>
             <div class="panel-body">
                 <?php
-                echo CHtml::link('Ver Agenda', '/gestionclinicas/citas/') . '<br>';
-                echo CHtml::link('Volver al inicio', '/gestionclinicas/') . '<br>';
+                echo CHtml::link('Ver todos', '/gestionclinicas/usuarios/') . '<br>';
+                echo CHtml::link('Completar datos clínicos', '/gestionclinicas/') . '<br>';
                 echo CHtml::link('Volver', Yii::app()->request->urlReferrer);
                 ?>
             </div>

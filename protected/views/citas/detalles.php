@@ -56,4 +56,5 @@
     <hr>
     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
     <?php echo CHtml::link('Editar Cita', '/gestionclinicas/citas/editar/' . $model->id, array('class'=>'btn btn-primary'))?>
+    <?php echo CHtml::link('Tomar Cita', Yii::app()->createUrl('/atenciones/nueva/' . $model->rut_paciente), array('class'=>'btn btn-success'))?>
 </div>

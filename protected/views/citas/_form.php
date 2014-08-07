@@ -29,7 +29,7 @@ $form = $this->beginWidget('CActiveForm', array(
                 <?php echo $form->textField($model, 'rut_profesional', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'claveProfesional')); ?>
                 <span class="input-group-addon" >
                     <a href="" >
-                        <span class="glyphicon glyphicon-search" onclick="buscar('profesional')"></span>
+                        <span class="glyphicon glyphicon-search" data-toggle="modal" data-target="#modalBuscar"></span>
                     </a>
                 </span>
             </div>
@@ -102,7 +102,7 @@ $form = $this->beginWidget('CActiveForm', array(
                     <h4 class="modal-title" id="myModalLabel">Buscar Profesional</h4>
                 </div>
                 <div class="modal-body" id="dataTarget">
-                    <?php //echo $this->renderPartial('_buscar', array('model' => null)); ?>
+    <?php //echo $this->renderPartial('_buscar', array('model' => null)); ?>
 
                 </div>
                 <div class="modal-footer">
@@ -142,7 +142,18 @@ $form = $this->beginWidget('CActiveForm', array(
             data: {clave: valor},
             success: function(data) {
                 if (data) {
-                    fillTable(data, tipo);
+                    var tabla = '<table class="table table-hover">';
+
+                    $.each(data.datos, function(i, item) {
+                        tabla += '<tr><td>' + item.rut + '</td><td>' + item.nombre_1 + ' '
+                                + item.apellido_paterno + '</td>' +
+                                '<td><a href="#"><span class="glyphicon glyphicon-plus onclick=add("' + item.rut + '","' + tipo + '")></span></a></td></tr>';
+                    });
+
+                    tabla += '</table>';
+
+                    $('#dataTarget').html(tabla);
+                    //fillTable(data, tipo);
                     //$('#dataTarget').html(data);
                 } else {
                     $('#dataTarget').html('El profesional no se encuentra registrado');
@@ -156,23 +167,7 @@ $form = $this->beginWidget('CActiveForm', array(
         });
     }
 
-    function fillTable(data, tipo) {
-
-        var tabla = '<table class="table table-hover">';
-
-        $.each(data.datos, function(i, item) {
-            tabla += '<tr><td>' + item.rut + '</td><td>' + item.nombre_1 + ' '
-                    + item.apellido_paterno + '</td>' +
-                    '<td><a href="#"><span class="glyphicon glyphicon-plus onclick=add("' + item.rut + '","' + tipo + '")></span></a></td></tr>';
-        });
-
-        tabla += '</table>';
-
-        $('#dataTarget').html(tabla);
-
-    }
-
-    function add(rut, tipo) {
+     function add(rut, tipo) {
 
         if (tipo === 'profesional')
             $('#rutProfesional').value = rut;

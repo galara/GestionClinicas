@@ -10,7 +10,6 @@ $this->breadcrumbs = array(
 ?>
 
 <h1>Detalles Paciente Rut: <?php echo $model->rut; ?></h1>
-
 <hr>
 
 <div class="row">
@@ -125,11 +124,11 @@ $this->breadcrumbs = array(
                     </div>
                     <div class="col-md-3">
                         Estatura: <br>
-                        <?php echo $model->estatura . ' ' . 'Cm.' ?>
+                        <?php //echo $model->estatura . ' ' . 'Cm.' ?>
                     </div>
                     <div class="col-md-3">
                         Peso: <br>
-                        <?php echo $model->peso . ' ' . 'Kg.' ?>
+                        <?php //echo $model->peso . ' ' . 'Kg.' ?>
                     </div>
                 </div>
                 <hr>
@@ -143,6 +142,8 @@ $this->breadcrumbs = array(
                 <?php
                 echo CHtml::link('Pacientes', '/gestionclinicas/pacientes/') . '<br>';
                 echo CHtml::link('Nuevo Paciente', '/gestionclinicas/pacientes/crear') . '<br>';
+                echo CHtml::link('Completar Datos Médicos', '/gestionclinicas/antecedentesmedicos/crear/' . $model->rut) . '<br>';
+                echo CHtml::link('Ver Datos Médicos', '/gestionclinicas/antecedentesmedicos/ver/' . $model->rut) . '<br>';
                 echo CHtml::link('Volver', Yii::app()->request->urlReferrer);
                 ?>
             </div>

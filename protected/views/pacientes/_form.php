@@ -14,6 +14,7 @@
         // There is a call to performAjaxValidation() commented in generated controller code.
         // See class documentation of CActiveForm for details on this.
         'enableAjaxValidation' => true,
+        'htmlOptions' => array('enctype' => 'multipart/form-data')
     ));
     ?>
     <p class="note">Campos con <span class="required">*</span> son obligatorios.</p>
@@ -30,8 +31,14 @@
                     <div class="row">
                         <div class="col-md-3">
                             <a href="#" class="thumbnail">
-                                <img data-src="holder.js/100%x200" alt="...">
+                                <?php if(!is_null($model->foto) || !empty($model->foto)): ?>
+                                <?php echo CHtml::image('/gestionclinicas/pacientes/displayImage/178200666', '', array('width' => '100%', 'height' => '250px')) ?>
+                                <?php else: ?>
+                                    <img  data-src="holder.js/100%x200" alt="...">
+                                <?php endif ?>
                             </a>
+                            <?php echo $form->filefield($model, 'foto') ?>
+                            <br>
                         </div>
                         <div class="col-md-9">
                             <div class="row">

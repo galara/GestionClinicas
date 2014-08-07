@@ -74,7 +74,7 @@ class CitasController extends Controller {
                         
             $citas[] = array(
                 'id' => $cita->id,
-                'title' => $cita->motivo,
+                'title' => $cita->fkPaciente->nombre_1 . ' ' . $cita->fkPaciente->apellido_paterno,
                 'url' => '/gestionclinicas/citas/' . $cita->id,
                 'class' => $this->tipoCitaToEvent($cita->fkTipoCita->tipo_cita),
                 'start' => (strtotime($cita->hora_inicio) + 18000) . '000',

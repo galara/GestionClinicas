@@ -68,6 +68,9 @@
                         <li <?php echo (Yii::app()->params['moduloActivo'] == 'Citas') ? 'class="active"' : '' ?>>
                             <?php echo CHtml::link('<span class="glyphicon glyphicon-calendar"></span>&nbsp; Agenda', '/GestionClinicas/citas') ?>
                         </li>
+                        <li <?php echo (Yii::app()->params['moduloActivo'] == 'atenciones') ? 'class="active"' : '' ?>>
+                            <?php echo CHtml::link('<span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Atenciones', '/GestionClinicas/pacientes') ?>
+                        </li>
                         <li <?php echo (Yii::app()->params['moduloActivo'] == 'Reportes') ? 'class="active"' : '' ?>>
                             <a href="#"><span class="glyphicon glyphicon-file"></span>&nbsp; Reportes</a>
                         </li> 
