@@ -14,7 +14,9 @@ $this->breadcrumbs = array(
     <hr>
 </div>
 <div class="row">
-    <?php $this->renderPartial('_form', array('model' => $model)); ?>
+    <div class="col-md-9">
+        <?php $this->renderPartial('_form', array('model' => $model)); ?>
+    </div>
     <div class="col-md-3">
         <div class="panel panel-primary">
             <div class="panel-heading">Operaciones</div>

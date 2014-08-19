@@ -2,6 +2,11 @@ body {
     padding-top: 60px;
     padding-bottom: 40px;
 }
+
+.imagen {
+    width: 100%;
+    height: 200px;
+}
 /*
 .zf-green {
     color: #68b604;

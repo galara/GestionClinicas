@@ -14,95 +14,100 @@
  * @property Profesionales[] $profesionales
  * @property Usuarios[] $usuarioses
  */
-class Ciudades extends CActiveRecord
-{
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'ciudades';
-	}
+class Ciudades extends CActiveRecord {
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
-		return array(
-			array('ciudad, id_comuna', 'required'),
-			array('id_comuna', 'numerical', 'integerOnly'=>true),
-			array('ciudad', 'length', 'max'=>45),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('id, ciudad, id_comuna', 'safe', 'on'=>'search'),
-		);
-	}
+    /**
+     * @return string the associated database table name
+     */
+    public function tableName() {
+        return 'ciudades';
+    }
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'idComuna' => array(self::BELONGS_TO, 'Comunas', 'id_comuna'),
-			'pacientes' => array(self::HAS_MANY, 'Pacientes', 'id_ciudad'),
-			'profesionales' => array(self::HAS_MANY, 'Profesionales', 'id_ciudad'),
-			'usuarioses' => array(self::HAS_MANY, 'Usuarios', 'id_ciudad'),
-		);
-	}
+    /**
+     * @return array validation rules for model attributes.
+     */
+    public function rules() {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+        return array(
+            array('ciudad, id_comuna', 'required', 'message' => 'El campo {attribute} es obligatorio.'),
+            array('id_comuna', 'numerical', 'integerOnly' => true),
+            array('ciudad', 'length', 'max' => 45),
+            array('ciudad', 'nombreExiste'),
+            // The following rule is used by search().
+            // @todo Please remove those attributes that should not be searched.
+            array('id, ciudad, id_comuna', 'safe', 'on' => 'search'),
+        );
+    }
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'id' => 'ID',
-			'ciudad' => 'Ciudad',
-			'id_comuna' => 'Id Comuna',
-		);
-	}
+    /**
+     * @return array relational rules.
+     */
+    public function relations() {
+        // NOTE: you may need to adjust the relation name and the related
+        // class name for the relations automatically generated below.
+        return array(
+            'fkComuna' => array(self::BELONGS_TO, 'Comunas', 'id_comuna'),
+            'pacientes' => array(self::HAS_MANY, 'Pacientes', 'id_ciudad'),
+            'profesionales' => array(self::HAS_MANY, 'Profesionales', 'id_ciudad'),
+            'usuarios' => array(self::HAS_MANY, 'Usuarios', 'id_ciudad'),
+        );
+    }
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
+    /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels() {
+        return array(
+            'id' => 'ID',
+            'ciudad' => 'Ciudad',
+            'id_comuna' => 'Comuna',
+        );
+    }
 
-		$criteria=new CDbCriteria;
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     *
+     * Typical usecase:
+     * - Initialize the model fields with values from filter form.
+     * - Execute this method to get CActiveDataProvider instance which will filter
+     * models according to data in model fields.
+     * - Pass data provider to CGridView, CListView or any similar widget.
+     *
+     * @return CActiveDataProvider the data provider that can return the models
+     * based on the search/filter conditions.
+     */
+    public function search() {
+        // @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('ciudad',$this->ciudad,true);
-		$criteria->compare('id_comuna',$this->id_comuna);
+        $criteria = new CDbCriteria;
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
+        $criteria->compare('id', $this->id);
+        $criteria->compare('ciudad', $this->ciudad, true);
+        $criteria->compare('id_comuna', $this->id_comuna);
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * Please note that you should have this exact method in all your CActiveRecord descendants!
-	 * @param string $className active record class name.
-	 * @return Ciudades the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+        return new CActiveDataProvider($this, array(
+            'criteria' => $criteria,
+        ));
+    }
+
+    /**
+     * Returns the static model of the specified AR class.
+     * Please note that you should have this exact method in all your CActiveRecord descendants!
+     * @param string $className active record class name.
+     * @return Ciudades the static model class
+     */
+    public static function model($className = __CLASS__) {
+        return parent::model($className);
+    }
+
+    public function nombreExiste($attribute, $params) {
+
+        $model = Ciudades::model()->findByAttributes(array('ciudad' => $this->ciudad, 'id_comuna' => $this->id_comuna));
+
+        if (!is_null($model)) {
+            $this->addError($attribute, 'La ciudad que intenta crear ya se encuentra registrada');
+        }
+    }
+
 }

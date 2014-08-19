@@ -80,7 +80,7 @@
                     <?php echo $form->error($model, 'acotaciones'); ?>
                 </div>
             </div>
-            <?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Save', array('class' => 'btn btn-primary')); ?>
+            <?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Modificar', array('class' => 'btn btn-primary')); ?>
         </div>
     </div>       
 </div>

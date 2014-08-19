@@ -29,8 +29,8 @@ class CategoriasDiagnosticos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('categoria', 'required'),
-			array('categoria, descripcion', 'length', 'max'=>45),
+			array('categoria', 'required', 'message' => 'El campo {attribute} es obligatorio'),
+			array('categoria, descripcion', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, categoria, descripcion', 'safe', 'on'=>'search'),

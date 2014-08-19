@@ -31,9 +31,9 @@ class Diagnosticos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('diagnostico, id_categoria', 'required'),
+			array('diagnostico, id_categoria', 'required', 'message' => 'El campo {attribute} es obligatorio.'),
 			array('id_categoria', 'numerical', 'integerOnly'=>true),
-			array('diagnostico, descripcion', 'length', 'max'=>45),
+			array('diagnostico, descripcion', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, diagnostico, descripcion, id_categoria', 'safe', 'on'=>'search'),
@@ -49,7 +49,7 @@ class Diagnosticos extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'atenciones' => array(self::HAS_MANY, 'Atenciones', 'id_diagnostico'),
-			'idCategoria' => array(self::BELONGS_TO, 'CategoriasDiagnosticos', 'id_categoria'),
+			'fkCategoria' => array(self::BELONGS_TO, 'CategoriasDiagnosticos', 'id_categoria'),
 		);
 	}
 
@@ -60,9 +60,9 @@ class Diagnosticos extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'diagnostico' => 'Diagnostico',
-			'descripcion' => 'Descripcion',
-			'id_categoria' => 'Id Categoria',
+			'diagnostico' => 'Diagnóstico',
+			'descripcion' => 'Descripción',
+			'id_categoria' => 'Categoría',
 		);
 	}
 

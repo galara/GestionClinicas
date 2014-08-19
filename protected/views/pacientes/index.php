@@ -23,7 +23,7 @@ $this->breadcrumbs = array(
 <hr>
 
 <!-- Formulario de búsqueda -->
-<?php echo CHtml::beginForm('/gestionclinicas/pacientes/Buscar', 'get', array('class' => 'form-horizontal', 'role' => 'form')) ?>
+<?php echo CHtml::beginForm(CController::createUrl('Pacientes/Buscar'), 'get', array('class' => 'form-horizontal', 'role' => 'form')) ?>
 <div class="form-group">
     <div class="col-sm-1">
         <label for="buscar" class="col-sm-2 control-label">Buscar:</label>

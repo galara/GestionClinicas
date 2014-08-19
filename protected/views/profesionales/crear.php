@@ -21,7 +21,6 @@ $this->breadcrumbs = array(
             <div class="panel-body">
                 <?php
                 echo CHtml::link('Ver todos', '/gestionclinicas/profesionales/') . '<br>';
-                echo CHtml::link('Completar datos clínicos', '/gestionclinicas/') . '<br>';
                 echo CHtml::link('Volver', Yii::app()->request->urlReferrer);
                 ?>
             </div>

@@ -1,21 +1,25 @@
-<?php
-$form = $this->beginWidget('CActiveForm', array(
-    'id' => 'citas-form',
-    'enableAjaxValidation' => true,
-        ));
-?>
+<div class="form">
+    <?php
+    $form = $this->beginWidget('CActiveForm', array(
+        'id' => 'citas-form',
+        'enableAjaxValidation' => true,
+    ));
+    ?>
 
-<?php echo $form->errorSummary($model, '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>', '', array('class' => 'alert alert-info alert-dismissible')); ?>
+    <?php
+    CHtml::$errorSummaryCss = 'alert alert-warning';
+    CHtml::$errorContainerTag = 'p';
+    echo $form->errorSummary($model, 'Se han detectado los siguientes errores:', '', array());
+    ?>
 
-<div class="col-sm-9">
     <div class='col-md-6'>
         <div class="form-group">
             <?php echo $form->labelEx($model, 'rut_paciente'); ?>
             <div class='input-group'>
-                <?php echo $form->textField($model, 'rut_paciente', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'clavePaciente')); ?>
+                <?php echo $form->textField($model, 'rut_paciente', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'rutPaciente', 'readonly' => 'readonly')); ?>
                 <span class="input-group-addon" >
-                    <a href="" >
-                        <span class="glyphicon glyphicon-search" onclick="buscar('paciente')"></span>
+                    <a href="#" onclick="toggleModal('paciente')">
+                        <span class="glyphicon glyphicon-search"></span>
                     </a>
                 </span>
             </div>
@@ -26,10 +30,10 @@ $form = $this->beginWidget('CActiveForm', array(
         <div class="form-group">
             <?php echo $form->labelEx($model, 'rut_profesional'); ?>
             <div class='input-group'>
-                <?php echo $form->textField($model, 'rut_profesional', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'claveProfesional')); ?>
+                <?php echo $form->textField($model, 'rut_profesional', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'rutProfesional', 'readonly' => 'readonly')); ?>
                 <span class="input-group-addon" >
-                    <a href="" >
-                        <span class="glyphicon glyphicon-search" data-toggle="modal" data-target="#modalBuscar"></span>
+                    <a href="#" onclick="toggleModal('profesional')">
+                        <span class="glyphicon glyphicon-search"></span>
                     </a>
                 </span>
             </div>
@@ -63,7 +67,7 @@ $form = $this->beginWidget('CActiveForm', array(
     <div class='col-md-12'>
         <div class="form-group">
             <?php echo $form->labelEx($model, 'id_tipo_cita'); ?>
-            <?php echo $form->dropDownList($model, 'id_tipo_cita', array(CHtml::listData(TipoCita::model()->findAll(), 'id', 'tipo_cita')), array('class' => 'form-control')); ?>
+            <?php echo $form->dropDownList($model, 'id_tipo_cita', CHtml::listData(TipoCita::model()->findAll(), 'id', 'tipo_cita'), array('class' => 'form-control', 'prompt'=> 'Seleccione...')); ?>
             <?php echo $form->error($model, 'id_tipo_cita', array('class' => 'text-danger')); ?>
         </div>
     </div>
@@ -83,57 +87,79 @@ $form = $this->beginWidget('CActiveForm', array(
     </div>
     <div class="form-group">
         <div class="col-sm-12">
-            <?php echo CHtml::submitButton('Guardar cambios', array('class' => 'btn btn-primary')); ?>
+            <?php echo CHtml::submitButton('Agendar Cita', array('class' => 'btn btn-primary')); ?>
         </div>
     </div>
 </div>
 <?php $this->endWidget(); ?>
 
 <!-- Modal -->
+<?php //echo $this->renderPartial('_buscar', array('model' => $model)); ?>
 <div class="modal fade" id="modalBuscar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <?php echo $this->renderPartial('_buscar', array('model' => $model)); ?>
-    <!-- <div class="modal-dialog">
+    <div class="modal-dialog">
         <div class="col-md-12">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
                     </button>
-                    <h4 class="modal-title" id="myModalLabel">Buscar Profesional</h4>
+                    <h4 class="modal-title" id="modalTittle">Buscar Profesional</h4>
                 </div>
-                <div class="modal-body" id="dataTarget">
-    <?php //echo $this->renderPartial('_buscar', array('model' => null)); ?>
-
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class='input-group'>
+                            <input type="text" name="clave" id="clave" class="form-control">
+                            <span class="input-group-addon" >
+                                <a href="" onclick="_buscar()">
+                                    <span class="glyphicon glyphicon-search" data-toggle="modal" data-target="#modalBuscar"></span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="dataTarget"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <a href="#" class="btn btn-primary" id="deleteButton">Aceptar</a>
+                    <a href="#" class="btn btn-primary" id="btnAgregar">Nuevo</a>
+                    <a href="#" class="btn btn-success" id="deleteButton" data-dismiss="modal">Listo!</a>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 </div>
 <!-- fin modal -->
 
 <script type="text/javascript">
 
+    var _tipo;
+    
+    function toggleModal(tipo){
+        
+        _tipo = tipo;
+        
+        if(tipo === 'profesional'){
+           $('#modalTittle').html('Seleccione Profesional'); 
+           $('#btnAgregar').attr('href', '/gestionclinicas/profesionales/crear');
+        }else{
+            $('#modalTittle').html('Seleccione Paciente');
+            $('#btnAgregar').attr('href', '/gestionclinicas/pacientes/crear');
+        }
+        
+        $('#dataTarget').html('');
+        $('#modalBuscar').modal('show');
+    }
     //peticion ajax para buscar profesionales o pacientes
-    function buscar(tipo) {
+    function _buscar() {
 
         var url = '';
         var valor = '';
 
-        if (tipo === 'profesional') {
+        if (_tipo === 'profesional') {
             url = '/gestionclinicas/profesionales/find';
-            valor = jQuery.trim($('#claveProfesional').val());
-            $('#modalTitle').html('Seleccione Profesional');
+            valor = jQuery.trim($('#clave').val());        
         } else {
             url = '/gestionclinicas/pacientes/find';
-            valor = jQuery.trim($('#clavePaciente').val());
-            $('#modalTitle').html('Seleccione Paciente');
+            valor = jQuery.trim($('#clave').val());
         }
-
-        //alert(valor + ' ' + url);
 
         $.ajax({
             url: url,
@@ -145,34 +171,36 @@ $form = $this->beginWidget('CActiveForm', array(
                     var tabla = '<table class="table table-hover">';
 
                     $.each(data.datos, function(i, item) {
-                        tabla += '<tr><td>' + item.rut + '</td><td>' + item.nombre_1 + ' '
-                                + item.apellido_paterno + '</td>' +
-                                '<td><a href="#"><span class="glyphicon glyphicon-plus onclick=add("' + item.rut + '","' + tipo + '")></span></a></td></tr>';
+                        tabla += '<tr>' +
+                                '<td>' + item.rut + '</td><td>' + item.nombre + '</td>' +
+                                '<td><a href="#" data-toggle="modal" data-target="#modalBuscar">' +
+                                '<span class="glyphicon glyphicon-plus" onclick=add("' + item.rut + '") >' +
+                                '</span></a>' +
+                                '</td>' +
+                                '</tr>';
                     });
 
                     tabla += '</table>';
 
                     $('#dataTarget').html(tabla);
-                    //fillTable(data, tipo);
-                    //$('#dataTarget').html(data);
+
                 } else {
-                    $('#dataTarget').html('El profesional no se encuentra registrado');
+                    $('#dataTarget').html('La búsqueda no produjo resultados.');
                 }
-                $('#modalBuscar').modal('show');
             },
             error: function(e) {
-                $('#dataTarget').html(e);
-                $('#modalBuscar').modal('show');
+                $('#dataTarget').html(e.toString());
             }
         });
     }
 
-     function add(rut, tipo) {
+    function add(rut) {
 
-        if (tipo === 'profesional')
-            $('#rutProfesional').value = rut;
+        if (_tipo === 'profesional') {
+            $('#rutProfesional').val(rut);
+        }
         else
-            $('#rutPaciente').value = rut;
+            $('#rutPaciente').val(rut);
 
     }
 

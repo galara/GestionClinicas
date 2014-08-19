@@ -28,7 +28,7 @@ class ProfesionalesController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'detalles', 'crear', 'eliminar', 'editar', 'find'),
+                'actions' => array('index', 'detalles', 'crear', 'eliminar', 'editar', 'find', 'displayImage'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -62,11 +62,20 @@ class ProfesionalesController extends Controller {
     public function actionCrear() {
         $model = new Profesionales;
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $this->performAjaxValidation($model);
 
         if (isset($_POST['Profesionales'])) {
             $model->attributes = $_POST['Profesionales'];
+            $model->pass_repeat = $_POST['Profesionales']['pass_repeat'];
+
+            if (!is_null(CUploadedFile::getInstance($model, 'foto'))) {
+                $file = CUploadedFile::getInstance($model, 'foto');
+                $fp = fopen($file->tempName, 'r');
+                $content = fread($fp, filesize($file->tempName));
+                fclose($fp);
+                $model->foto = $content;
+            }
+
             if ($model->save()) {
                 $this->mensaje = 'El Médico ' . $model->rut . ' ha sido registrado con éxito';
                 $this->forward('index');
@@ -78,27 +87,55 @@ class ProfesionalesController extends Controller {
         ));
     }
 
+    public function actionDisplayImage($id) {
+
+        $model = Profesionales::model()->findByPk($id);
+
+        header('Content-Type: jpg');
+        echo $model->foto;
+        
+    }
+    
     /**
      * Updates a particular model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id the ID of the model to be updated
      */
     public function actionEditar($id) {
-        $model = $this->loadModel($id);
+        
+        $loadedModel = $this->loadModel($id);
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $this->performAjaxValidation($loadedModel);
 
         if (isset($_POST['Profesionales'])) {
+
+            $model = $this->loadModel($id);
             $model->attributes = $_POST['Profesionales'];
+            $model->pass_repeat = $_POST['Profesionales']['pass_repeat'];
+            
+//            echo $model->pass_repeat;
+//            Yii::app()->end();
+            
+            if (!is_null(CUploadedFile::getInstance($model, 'foto'))) {
+
+                $file = CUploadedFile::getInstance($model, 'foto');
+                $fp = fopen($file->tempName, 'r');
+                $content = fread($fp, filesize($file->tempName));
+                fclose($fp);
+                $model->foto = $content;
+                
+            }else{
+                $model->foto = $loadedModel->foto;
+            }            
+            
             if ($model->save()) {
-                $this->mensaje = 'Los datos del profesional ' . $model->rut . ' han sido modificados exitosamente';
+                $this->mensaje = 'El paciente rut ' . $model->rut . ' ha sido editado correctamente';
                 $this->forward('index');
             }
         }
 
         $this->render('editar', array(
-            'model' => $model,
+            'model' => $loadedModel,
         ));
     }
 
@@ -148,19 +185,27 @@ class ProfesionalesController extends Controller {
     public function actionFind() {
 
         if (isset($_GET['clave'])) {
-            
+
             $q = $_GET['clave'];
             $criterio = new CDbCriteria();
             $criterio->compare('nombre_1', $q, true, 'OR');
             $criterio->compare('apellido_paterno', $q, true, 'OR');
             $criterio->compare('rut', $q, true, 'OR');
-            
+
             $resultado = Profesionales::model()->findAll($criterio);
+            $profesional = array();
+            
+            foreach ($resultado as $row){
+                $profesional[] = array(
+                    'rut' => $row->rut,
+                    'nombre' => $row->nombre_1 . ' ' . $row->apellido_paterno . ' ' . $row->apellido_materno,
+                );
+            }
             
             if ($resultado) {
                 echo CJSON::encode(array(
                     'result' => 'success',
-                    'datos' => $resultado,
+                    'datos' => $profesional,
                 ));
             } else {
                 echo CJSON::encode(array('result' => 'notfound', 'datos' => 'El profesional no existe'));
@@ -191,8 +236,9 @@ class ProfesionalesController extends Controller {
      */
     public function loadModel($id) {
         $model = Profesionales::model()->findByPk($id);
-        if ($model === null)
-            throw new CHttpException(404, 'The requested page does not exist.');
+        if ($model === null){
+            throw new CHttpException(404, 'La página solicitada no existe.');
+        }
         return $model;
     }
 

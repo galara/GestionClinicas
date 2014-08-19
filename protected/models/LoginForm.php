@@ -21,7 +21,8 @@ class LoginForm extends CFormModel {
     public function rules() {
         return array(
             // username and password are required
-            array('username, password, perfil', 'required'),
+            array('username, password, perfil', 'required', 'message' => 'El campo {attribute} es obligatorio.'),
+            array('perfil', 'validaPerfil'),
             // rememberMe needs to be a boolean
             array('rememberMe', 'boolean'),
             // password needs to be authenticated
@@ -35,6 +36,8 @@ class LoginForm extends CFormModel {
     public function attributeLabels() {
         return array(
             'rememberMe' => 'Recordar nombre de usuario y contraseña',
+            'username' => 'Rut',
+            'password' => 'Contraseña'
         );
     }
 
@@ -43,7 +46,7 @@ class LoginForm extends CFormModel {
      * This is the 'authenticate' validator as declared in rules().
      */
     public function authenticate($attribute, $params) {
-    
+
         if (!$this->hasErrors()) {
             $this->_identity = new UserIdentity($this->username, $this->password);
             $this->_identity->userType = $this->perfil;
@@ -59,6 +62,9 @@ class LoginForm extends CFormModel {
      * @return boolean whether login is successful
      */
     public function login() {
+//        print_r($this->username);
+//        Yii::app()->end();
+        
         if ($this->_identity === null) {
             $this->_identity = new UserIdentity($this->username, $this->password);
             $this->_identity->authenticate();
@@ -67,8 +73,16 @@ class LoginForm extends CFormModel {
             $duration = $this->rememberMe ? 3600 * 24 * 30 : 0; // 30 days
             Yii::app()->user->login($this->_identity, $duration);
             return true;
-        } else
+        } else{
             return false;
+        }
+    }
+
+    public function validaPerfil($attribute, $params) {
+
+        if (empty($this->perfil) || $this->perfil === '') {
+            $this->addError($attribute, 'Debe seleccionar un perfil.');
+        }
     }
 
 }

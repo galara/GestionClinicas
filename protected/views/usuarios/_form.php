@@ -9,21 +9,18 @@
     <?php
     $form = $this->beginWidget('CActiveForm', array(
         'id' => 'usuarios-form',
-        // Please note: When you enable ajax validation, make sure the corresponding
-        // controller action is handling ajax validation correctly.
-        // There is a call to performAjaxValidation() commented in generated controller code.
-        // See class documentation of CActiveForm for details on this.
-        'enableAjaxValidation' => false,
+        'enableAjaxValidation' => true,
     ));
     ?>
 
-    <p class="note">Campos con <span class="required">*</span> son obligatorios.</p>
-
     <?php
-    // echo $form->errorSummary($model); 
+    CHtml::$errorSummaryCss = 'alert alert-warning';
     CHtml::$errorContainerTag = 'p';
+    echo $form->errorSummary($model, 'Se han detectado los siguientes errores:', '', array());
     ?>
-
+    
+    <p class="note">Campos con <span class="required">*</span> son obligatorios.</p>
+    
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -31,7 +28,7 @@
                     <div class="row form-group">
                         <div class="col-md-6">
                             <?php echo $form->labelEx($model, 'rut'); ?>
-                            <?php echo $form->textField($model, 'rut', array('size' => 12, 'maxlength' => 12, 'class' => 'form-control')); ?>
+                            <?php echo $form->textField($model, 'rut', array('size' => 12, 'maxlength' => 12, 'class' => 'form-control', 'readonly' => $model->isNewRecord ? '' : 'readonly', 'placeholder' => 'Ej:11222333-4')); ?>
                             <?php echo $form->error($model, 'rut', array('class' => 'text-danger')); ?>
                         </div>
                     </div> 
@@ -62,7 +59,7 @@
                     <div class="row form-group">
                         <div class="col-md-6">
                             <?php echo $form->labelEx($model, 'calular'); ?>
-                            <?php echo $form->textField($model, 'calular', array('size' => 12, 'maxlength' => 12, 'class' => 'form-control')); ?>
+                            <?php echo $form->textField($model, 'calular', array('size' => 9, 'maxlength' => 9, 'class' => 'form-control')); ?>
                             <?php echo $form->error($model, 'calular', array('class' => 'text-danger')); ?>
                         </div>
                         <div class="col-md-6">
@@ -79,20 +76,20 @@
                         </div>
                         <div class="col-md-6">
                             <?php echo $form->labelEx($model, 'id_sexo'); ?>
-                            <?php echo $form->dropDownList($model, 'id_sexo', array(CHtml::listData(Sexo::model()->findAll(), 'id', 'sexo')), array('class' => 'form-control')) ?>
+                            <?php echo $form->dropDownList($model, 'id_sexo', CHtml::listData(Sexo::model()->findAll(), 'id', 'sexo'), array('class' => 'form-control', 'prompt' => 'Seleccione...')) ?>
                             <?php echo $form->error($model, 'id_sexo', array('class' => 'text-danger')); ?>
                         </div>
                     </div>
                     <div class="row form-group">
                         <div class="col-md-6">
                             <?php echo $form->labelEx($model, 'pass'); ?>
-                            <?php echo $form->textField($model, 'pass', array('size' => 45, 'maxlength' => 45, 'class' => 'form-control')); ?>
+                            <?php echo $form->passwordField($model, 'pass', array('size' => 45, 'maxlength' => 45, 'class' => 'form-control')); ?>
                             <?php echo $form->error($model, 'pass', array('class' => 'text-danger')); ?>
                         </div>
                         <div class="col-md-6">
-                            <?php echo $form->labelEx($model, 'pass'); ?>
-                            <?php echo $form->textField($model, 'pass', array('size' => 45, 'maxlength' => 45, 'class' => 'form-control')); ?>
-                            <?php echo $form->error($model, 'pass', array('class' => 'text-danger')); ?>
+                            <?php echo $form->labelEx($model, 'pass_repeat'); ?>
+                            <?php echo $form->passwordField($model, 'pass_repeat', array('size' => 45, 'maxlength' => 45, 'class' => 'form-control')); ?>
+                            <?php echo $form->error($model, 'pass_repeat', array('class' => 'text-danger')); ?>
                         </div>
                     </div>
                     <div class="row form-group">
@@ -103,7 +100,7 @@
                         </div>
                         <div class="col-md-4">
                             <?php echo $form->labelEx($model, 'id_ciudad'); ?>
-                            <?php echo $form->dropDownList($model, 'id_ciudad', array(CHtml::listData(Ciudades::model()->findAll(), 'id', 'ciudad')), array('class' => 'form-control')); ?>
+                            <?php echo $form->dropDownList($model, 'id_ciudad', CHtml::listData(Ciudades::model()->findAll(), 'id', 'ciudad'), array('class' => 'form-control', 'prompt' => 'Seleccione...')); ?>
                             <?php echo $form->error($model, 'id_ciudad', array('class' => 'text-danger')); ?>
                         </div>
                     </div>

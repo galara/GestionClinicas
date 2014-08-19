@@ -27,12 +27,12 @@ class AntecedentesMedicosController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'ver', 'crear', 'editar'),
+                'actions' => array(''),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
-                'users' => array('*'),
+                'actions' => array('index', 'ver', 'crear', 'editar'),
+                'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
                 'actions' => array('admin', 'delete'),
@@ -50,7 +50,14 @@ class AntecedentesMedicosController extends Controller {
      */
     public function actionVer($id) {
         $this->_rutPaciente = $id;
-
+        
+        $model = AntecedentesMedicos::model()->findByPk($id);
+        
+        if(is_null($model) || empty($model)){
+            $this->forward('antecedentesmedicos/crear/' . $id);
+            Yii::app()->end();
+        }
+        
         $this->render('detalles', array(
             'model' => $this->loadModel($id),
         ));
@@ -61,18 +68,22 @@ class AntecedentesMedicosController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
     public function actionCrear($id) {
-        $model = new AntecedentesMedicos;
-
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        
+        $model = AntecedentesMedicos::model()->findByPk($id);
+        
+        if(is_null($model) || empty($model)){
+            $model = new AntecedentesMedicos;
+        }
+        
+        $this->performAjaxValidation($model);
         $this->_rutPaciente = $id;
 
         if (isset($_POST['AntecedentesMedicos'])) {
             $model->attributes = $_POST['AntecedentesMedicos'];
             $model->rut_paciente = $this->_rutPaciente;
             if ($model->save()){
-                $this->_mensaje = 'Se han modificado los Antecedentes Médicos del paciente ' . $id;
-                $this->forward('ver');
+                $this->_mensaje = 'Se han guardado los Antecedentes Médicos del paciente ' . $id;
+                $this->forward('antecedentesmedicos/ver/' . $id);
             }
         }
 
@@ -128,21 +139,7 @@ class AntecedentesMedicosController extends Controller {
             'dataProvider' => $dataProvider,
         ));
     }
-
-    /**
-     * Manages all models.
-     */
-    public function actionAdmin() {
-        $model = new AntecedentesMedicos('search');
-        $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['AntecedentesMedicos']))
-            $model->attributes = $_GET['AntecedentesMedicos'];
-
-        $this->render('admin', array(
-            'model' => $model,
-        ));
-    }
-
+    
     /**
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
@@ -153,7 +150,7 @@ class AntecedentesMedicosController extends Controller {
     public function loadModel($id) {
         $model = AntecedentesMedicos::model()->findByPk($id);
         if ($model === null)
-            throw new CHttpException(404, 'The requested page does not exist.');
+            throw new CHttpException(404, 'La página solicitada no existe.');
         return $model;
     }
 

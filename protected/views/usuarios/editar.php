@@ -2,6 +2,8 @@
 /* @var $this UsuariosController */
 /* @var $model Usuarios */
 
+Yii::app()->params['moduloActivo'] = $this->selectedItem;
+
 $this->breadcrumbs=array(
 	'Usuarios'=>array('index'),
 	'Usuario ' . $model->rut=>array('detalles','id'=>$model->rut),

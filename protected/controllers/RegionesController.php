@@ -12,7 +12,6 @@ class RegionesController extends Controller {
      * @var CActiveRecord the currently loaded data model instance.
      */
     private $_model;
- 
     public $mensaje;
 
     /**
@@ -32,15 +31,15 @@ class RegionesController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'search', 'create', 'editar'),
+                'actions' => array('index'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+                'actions' => array('view', 'search', 'create', 'editar'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
+                'actions' => array('eliminar'),
                 'users' => array('admin'),
             ),
             array('deny', // deny all users
@@ -110,10 +109,9 @@ class RegionesController extends Controller {
      * Deletes a particular model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      */
-    public function actionDelete($id = null) {
+    public function actionEliminar($id) {
 
         $affected = Regiones::model()->deleteByPk($id);
-        //$region = Regiones::model()->findByPk($id);
 
         if ($affected > 0) {
             $this->mensaje = 'El elemento ha sido eliminado exitosamente';
@@ -168,29 +166,17 @@ class RegionesController extends Controller {
     }
 
     /**
-     * Manages all models.
-     */
-    public function actionAdmin() {
-        $model = new Regiones('search');
-        $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Regiones']))
-            $model->attributes = $_GET['Regiones'];
-
-        $this->render('admin', array(
-            'model' => $model,
-        ));
-    }
-
-    /**
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
      */
     public function loadModel() {
         if ($this->_model === null) {
-            if (isset($_GET['id']))
+            if (isset($_GET['id'])){
                 $this->_model = Regiones::model()->findbyPk($_GET['id']);
-            if ($this->_model === null)
-                throw new CHttpException(404, 'The requested page does not exist.');
+            }
+            if ($this->_model === null){
+                throw new CHttpException(404, 'La página solicitada no existe.');
+            }
         }
         return $this->_model;
     }

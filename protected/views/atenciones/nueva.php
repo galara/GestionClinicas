@@ -23,8 +23,9 @@ $this->breadcrumbs=array(
             <div class="panel-heading">Operaciones</div>
             <div class="panel-body">
                 <?php
-                echo CHtml::link('Ver todos', '/gestionclinicas/profesionales/') . '<br>';
-                echo CHtml::link('Completar datos clínicos', '/gestionclinicas/') . '<br>';
+                echo CHtml::link('Ver Datos de Paciente', '/gestionclinicas/pacientes/detalles/' . $this->rutPaciente) . '<br>';
+                echo CHtml::link('Ver datos clínicos', '/gestionclinicas/antecedentesmedicos/ver/' . $this->rutPaciente) . '<br>';
+                echo CHtml::link('Completar datos clínicos', '/gestionclinicas/antecedentesmedicos/crear/' .$this->rutPaciente) . '<br>';
                 echo CHtml::link('Volver', Yii::app()->request->urlReferrer);
                 ?>
             </div>

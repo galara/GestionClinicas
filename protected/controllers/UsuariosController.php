@@ -27,15 +27,15 @@ class UsuariosController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'detalles', 'crear', 'editar'),
+                'actions' => array('index'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+                'actions' => array('detalles', 'crear', 'editar'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
+                'actions' => array('Eliminar'),
                 'users' => array('admin'),
             ),
             array('deny', // deny all users
@@ -61,11 +61,11 @@ class UsuariosController extends Controller {
     public function actionCrear() {
         $model = new Usuarios;
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $this->performAjaxValidation($model);
 
         if (isset($_POST['Usuarios'])) {
             $model->attributes = $_POST['Usuarios'];
+            $model->pass_repeat = $_POST['Usuarios']['pass_repeat'];
             if ($model->save()){
                 $this->mensaje = 'El usuario ' . $model->rut . ' ha sido registrado en el sistema.';
                 $this->forward('index');
@@ -86,10 +86,11 @@ class UsuariosController extends Controller {
         $model = $this->loadModel($id);
 
         // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $this->performAjaxValidation($model);
 
         if (isset($_POST['Usuarios'])) {
             $model->attributes = $_POST['Usuarios'];
+            $model->pass_repeat = $_POST['Usuarios']['pass_repeat'];
             if ($model->save()){
                 $this->mensaje = 'Los datos del usuario ' . $model->rut . ' han sido editados.';
                 $this->forward('index');
@@ -106,12 +107,13 @@ class UsuariosController extends Controller {
      * If deletion is successful, the browser will be redirected to the 'admin' page.
      * @param integer $id the ID of the model to be deleted
      */
-    public function actionDelete($id) {
-        $this->loadModel($id)->delete();
+    public function actionEliminar($id) {
+        $affected = Usuarios::model()->deleteByPk($id);
 
-        // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-        if (!isset($_GET['ajax']))
-            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+        if ($affected > 0) {
+            $this->mensaje = 'El usuario ha sido eliminado exitosamente';
+            $this->forward('index');
+        }
     }
 
     /**
@@ -163,8 +165,9 @@ class UsuariosController extends Controller {
      */
     public function loadModel($id) {
         $model = Usuarios::model()->findByPk($id);
-        if ($model === null)
-            throw new CHttpException(404, 'The requested page does not exist.');
+        if ($model === null){
+            throw new CHttpException(404, 'La página solicitada no existe.');
+        }
         return $model;
     }
 

@@ -5,7 +5,7 @@ Yii::app()->params['moduloActivo'] = $this->selectedItem;
 
 $this->breadcrumbs=array(
 	'Profesionales'=>array('index'),
-	'Profesional' + $model->rut=>array('view','id'=>$model->rut),
+	'Profesional ' . $model->rut=>array('view','id'=>$model->rut),
 	'Editar',
 );
 ?>

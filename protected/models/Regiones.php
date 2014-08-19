@@ -24,12 +24,14 @@ class Regiones extends CActiveRecord {
         // will receive user inputs.
         return array(
             array('id', 'numerical', 'integerOnly' => true),
+            array('id', 'length', 'max' => 2),
             array('region', 'length', 'max' => 45),
+            array('id', 'idExiste'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
             array('id, region', 'safe', 'on' => 'search'),
             array('region, id', 'required',
-                'message' => 'Rellene el campo {attribute}. ')
+                'message' => 'El campo {attribute} es requerido. ')
         );
     }
 
@@ -87,5 +89,15 @@ class Regiones extends CActiveRecord {
     public static function model($className = __CLASS__) {
         return parent::model($className);
     }
+    
+    public function idExiste($attribute, $params){
+        
+        $id = Regiones::model()->findByPk($this->id);
 
+        if (!is_null($id) && $this->isNewRecord) {            
+            $this->addError($attribute, 'El id ingresado ya se encuentra registrado.');
+        }
+        
+    }
+    
 }

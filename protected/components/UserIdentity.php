@@ -19,33 +19,37 @@ class UserIdentity extends CUserIdentity {
     public $userType = '';
     
     public function authenticate() {
-        
-        if ($this->userType == 'administrativo') {
+//        echo $this->userType . $this->username . $this->password;
+//        Yii::app()->end();  
+        if ($this->userType == 'profesional') {
             
-            $medicos = Profesionales::model()->findByPk('1780066-6');
+            $medicos = Profesionales::model()->findByPk($this->username);
             
             if (is_null($medicos)) {
                 $this->errorCode = self::ERROR_PASSWORD_INVALID;
             } elseif ($medicos->pass != $this->password) {
                 $this->errorCode = self::ERROR_PASSWORD_INVALID;
             } else {
-                $this->setState('perfil', 'Médico');
-                $this->setState('name', $medicos->nombres . ' ' . $medicos->apellido_paterno);
+                $this->setState('perfil', 'profesional');
+                $this->setState('name', $medicos->nombre_1 . ' ' . $medicos->apellido_paterno);
+                $this->setState('rut', $this->username);
                 $this->errorCode = self::ERROR_NONE;
             }
             return !$this->errorCode;
         }
         
         if ($this->userType == 'administrativo') {
-            $usuarios = Profesionales::model()->findByPk($this->rutUsuario);
+           
+            $usuarios = Usuarios::model()->findByPk($this->username);
 
-            if (is_null($medicos)) {
+            if (is_null($usuarios)) {
                 $this->errorCode = self::ERROR_PASSWORD_INVALID;
-            } elseif ($medicos->pass != $this->password) {
+            } elseif ($usuarios->pass != $this->password) {
                 $this->errorCode = self::ERROR_PASSWORD_INVALID;
             } else {
-                $this->setState('perfil', 'Médico');
-                $this->setState('name', $medicos->nombres . ' ' . $medicos->apellido_paterno);
+                $this->setState('perfil', 'usuario');
+                $this->setState('name', $usuarios->nombre_1 . ' ' . $usuarios->apellido_paterno);
+                $this->setState('rut', $this->username);
                 $this->errorCode = self::ERROR_NONE;
             }
             return !$this->errorCode;

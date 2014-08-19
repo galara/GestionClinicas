@@ -15,6 +15,7 @@
 
         <!-- archivos necesarios para datetime picker -->
         <link href="<?php echo Yii::app()->request->baseUrl; ?>/public/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+        <link href="<?php echo Yii::app()->request->baseUrl; ?>/public/css/datepicker.css" rel="stylesheet" media="screen">
         <!-- fin archivos necesarios para DateTimePicker -->
 
 
@@ -23,11 +24,17 @@
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>     
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/bower_components/bootstrap-calendar/js/language/es-ES.js"></script>
         <!-- fin scripts bootstrap-calendar -->
-
+        <!-- validador de rut -->
+        <script src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/jquery.Rut.min.js"></script>
+        <!--fin validador de rut -->
         <!-- scripts datetimepicker-->      
         <script src="<?php echo Yii::app()->request->baseUrl; ?>/public/bower_components/eonasdan-bootstrap-datetimepicker/bootstrap/bootstrap.min.js"></script>
         <link rel="stylesheet" href="<?php echo Yii::app()->request->baseUrl; ?>/public/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
         <!-- scripts datetimepicker -->
+
+        <!-- file-input script-->
+        <script src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/bootstrap-filestyle.min.js"></script>
+        <!-- fin file-input script -->
 
         <title><?php echo CHtml::encode($this->pageTitle); ?></title>
     </head>
@@ -45,14 +52,17 @@
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span>&nbsp; Perfil <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><?php echo CHtml::link('Mantenedores', array('mantenedores/index')); ?></li>
-                                <li><a href="#">Editar mis datos</a></li>
-                            </ul>
-                        </li>
-                        <li><a href=""><span class="glyphicon glyphicon-off"></span>&nbsp; Cerrar Sesión</a></li>
+                        <?php if (Yii::app()->user->isGuest): ?>
+                            <li><a href="<?php echo Yii::app()->baseUrl . '/site/login' ?>"><span class="glyphicon glyphicon-user"></span>&nbsp; Iniciar Sesión</a></li>
+                        <?php else: ?>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span>&nbsp;<?php echo Yii::app()->user->name ?> <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><?php echo CHtml::link('Editar mis datos', (Yii::app()->user->perfil === 'profesional' ) ? array('profesionales/editar/' . Yii::app()->user->rut) : array('usuarios/editar/' . Yii::app()->user->rut)); ?></li>
+                                </ul>
+                            </li>
+                            <li><a href="<?php echo Yii::app()->baseUrl . '/site/logout' ?>"><span class="glyphicon glyphicon-off"></span>&nbsp; Cerrar Sesión</a></li>
+                        <?php endif ?>
                     </ul>
                 </div><!--/.nav-collapse -->
             </div>
@@ -69,10 +79,10 @@
                             <?php echo CHtml::link('<span class="glyphicon glyphicon-calendar"></span>&nbsp; Agenda', '/GestionClinicas/citas') ?>
                         </li>
                         <li <?php echo (Yii::app()->params['moduloActivo'] == 'atenciones') ? 'class="active"' : '' ?>>
-                            <?php echo CHtml::link('<span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Atenciones', '/GestionClinicas/pacientes') ?>
+                            <?php echo CHtml::link('<span class="glyphicon glyphicon-folder-open"></span>&nbsp; Atenciones', '/GestionClinicas/atenciones') ?>
                         </li>
-                        <li <?php echo (Yii::app()->params['moduloActivo'] == 'Reportes') ? 'class="active"' : '' ?>>
-                            <a href="#"><span class="glyphicon glyphicon-file"></span>&nbsp; Reportes</a>
+                        <li <?php echo (Yii::app()->params['moduloActivo'] == 'reportes') ? 'class="active"' : '' ?>>
+                            <?php echo CHtml::link('<span class="glyphicon glyphicon-file"></span>&nbsp; Reportes', '/GestionClinicas/reportes'); ?>
                         </li> 
                         <li <?php echo (Yii::app()->params['moduloActivo'] == 'pacientes') ? 'class="active"' : '' ?>>
                             <?php echo CHtml::link('<span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Pacientes', '/GestionClinicas/pacientes') ?>
@@ -106,16 +116,20 @@
                         <?php echo $content; ?>
                     </div>
                     <hr>
-                    <footer>
-                        <p>Footer</p>
-                    </footer>
+                    <div class="row">
+                        <footer>
+                            <h6>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                Ut imperdiet luctus quam. Proin tortor eros, accumsan vitae nisi sed, fermentum porttitor sapien.
+                            </h6>
+                        </footer>
+                    </div>
                 </div>
             </div>
         </div> 
-
         <!-- Scripts -->
 
-        <!--<script type="text/javascript" src="<?php //echo Yii::app()->request->baseUrl; ?>/public/js/jquery.min.js"></script>-->
+        <!--<script type="text/javascript" src="<?php //echo Yii::app()->request->baseUrl;             ?>/public/js/jquery.min.js"></script>-->
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/holder.js"></script>
 
@@ -124,8 +138,11 @@
 
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
         <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/locales/bootstrap-datetimepicker.es.js" charset="UTF-8"></script>
-
+        <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/locales/bootstrap-datepicker.es.js"></script>
+        <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/public/js/bootstrap-datepicker.js" charset="UTF-8"></script>
         <script src="<?php echo Yii::app()->request->baseUrl; ?>/public/bower_components/moment/moment.js"></script>
+
+
         <!-- Fin Scripts -->
 
     </body>

@@ -1,4 +1,7 @@
 <?php
+
+Yii::app()->params['moduloActivo'] = 'mantenedores';
+
 $this->breadcrumbs = array(
     'Regiones' => array('index'),
     'Editar',

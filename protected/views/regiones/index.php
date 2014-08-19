@@ -127,7 +127,7 @@ Yii::app()->params['moduloActivo'] = 'mantenedores';
 
     function openModal(id, nombre) {
         $('#dataTarget').html(nombre + ', id: ' + id);
-        $('#deleteButton').attr('href', 'eliminar/' + id);
+        $('#deleteButton').attr('href', '/gestionclinicas/regiones/eliminar/' + id);
         $('#myModal').modal('show');
     }
 

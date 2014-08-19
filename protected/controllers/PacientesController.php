@@ -22,11 +22,12 @@ class PacientesController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'detalles', 'crear', 'editar', 'admin', 'eliminar', 'buscar', 'displayImage'),
+                'actions' => array(''),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+                'actions' => array('index', 'detalles', 'crear',
+                    'editar', 'admin', 'eliminar', 'buscar', 'displayImage', 'find'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -44,6 +45,7 @@ class PacientesController extends Controller {
      * @param integer $id the ID of the model to be displayed
      */
     public function actionDetalles($id) {
+        //echo $id;
         $this->render('detalles', array(
             'model' => $this->loadModel($id),
         ));
@@ -56,13 +58,12 @@ class PacientesController extends Controller {
     public function actionCrear() {
         $model = new Pacientes;
 
-        // Uncomment the following line if AJAX validation is needed
         $this->performAjaxValidation($model);
 
         if (isset($_POST['Pacientes'])) {
             $model->attributes = $_POST['Pacientes'];
 
-            if (!empty($_FILES['foto'])) {
+            if (!is_null(CUploadedFile::getInstance($model, 'foto'))) {
                 $file = CUploadedFile::getInstance($model, 'foto');
                 $fp = fopen($file->tempName, 'r');
                 $content = fread($fp, filesize($file->tempName));
@@ -70,44 +71,59 @@ class PacientesController extends Controller {
                 $model->foto = $content;
             }
 
-            if ($model->save())
-                $this->redirect(array('detalles', 'id' => $model->rut));
+            if ($model->save()) {
+                $this->mensaje = 'Se ha agregado un paciente correctamente';
+                $this->forward('index');
+            }
         }
 
         $this->render('crear', array(
             'model' => $model,
         ));
     }
-    
-    public function actionDisplayImage($id){
-        
+
+    public function actionDisplayImage($id) {
+
         $model = Pacientes::model()->findByPk($id);
-        
+
         header('Content-Type: jpg');
         echo $model->foto;
-        
     }
+
     /**
-     * Updates a particular model.
-     * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id the ID of the model to be updated
      */
     public function actionEditar($id) {
-        $model = $this->loadModel($id);
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $loadedModel = $this->loadModel($id);
+
+        $this->performAjaxValidation($loadedModel);
 
         if (isset($_POST['Pacientes'])) {
+
+            $model = $this->loadModel($id);
             $model->attributes = $_POST['Pacientes'];
-            $this->mensaje = 'El paciente rut ' . $model->rut . ' ha sido editado correctamente';
-            if ($model->save())
-            //$this->redirect(array('index', 'id' => $model->rut));
+            
+            if (!is_null(CUploadedFile::getInstance($model, 'foto'))) {
+
+                $file = CUploadedFile::getInstance($model, 'foto');
+                $fp = fopen($file->tempName, 'r');
+                $content = fread($fp, filesize($file->tempName));
+                fclose($fp);
+                $model->foto = $content;
+                
+            }else{
+                $model->foto = $loadedModel->foto;
+            }            
+            
+            if ($model->save()) {
+                $this->mensaje = 'El paciente rut ' . $model->rut . ' ha sido editado correctamente';
                 $this->forward('index');
+            }
         }
 
         $this->render('editar', array(
-            'model' => $model,
+            'model' => $loadedModel,
         ));
     }
 
@@ -171,20 +187,52 @@ class PacientesController extends Controller {
         ));
     }
 
+ 
+    public function actionFind() {
+
+        if (isset($_GET['clave'])) {
+
+            $q = $_GET['clave'];
+            $criterio = new CDbCriteria();
+            $criterio->compare('nombre_1', $q, true, 'OR');
+            $criterio->compare('apellido_paterno', $q, true, 'OR');
+            $criterio->compare('rut', $q, true, 'OR');
+
+            $resultado = Pacientes::model()->findAll($criterio);
+            $profesional = array();
+            
+            foreach ($resultado as $row){
+                $profesional[] = array(
+                    'rut' => $row->rut,
+                    'nombre' => $row->nombre_1 . ' ' . $row->apellido_paterno . ' ' . $row->apellido_materno,
+                );
+            }
+            
+            if ($resultado) {
+                echo CJSON::encode(array(
+                    'result' => 'success',
+                    'datos' => $profesional,
+                ));
+            } else {
+                echo CJSON::encode(array('result' => 'notfound', 'datos' => 'El profesional no existe'));
+            }
+        }
+    }
+
     /**
      * Manages all models.
      */
     public function actionAdmin() {
-        $model = new Pacientes('search');
+        $model = new Profesionales('search');
         $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Pacientes']))
-            $model->attributes = $_GET['Pacientes'];
-
+        if (isset($_GET['Profesionales'])) {
+            $model->attributes = $_GET['Profesionales'];
+        }
         $this->render('admin', array(
             'model' => $model,
         ));
     }
-
+    
     /**
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
@@ -194,8 +242,9 @@ class PacientesController extends Controller {
      */
     public function loadModel($id) {
         $model = Pacientes::model()->findByPk($id);
-        if ($model === null)
+        if ($model === null) {
             throw new CHttpException(404, 'The requested page does not exist.');
+        }
         return $model;
     }
 

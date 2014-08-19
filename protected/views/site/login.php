@@ -5,7 +5,7 @@
 
 $this->pageTitle = Yii::app()->name . ' - Login';
 $this->breadcrumbs = array(
-    'Login',
+    'Ingreso a Gestión Clínicas',
 );
 ?>
 
@@ -49,8 +49,9 @@ $this->breadcrumbs = array(
             <div class="col-sm-10">
                 <?php
                 echo $form->dropDownList($model, 'perfil', array(
-                    '' => 'Seleccione...',
-                    'administrativo' => 'Administrativo'
+                    'ninguno' => 'Seleccione...',
+                    'administrativo' => 'Administrativo',
+                    'profesional' => 'Médico'
                         ), array('class' => 'form-control'))
                 ?>
             </div>
