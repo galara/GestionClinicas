@@ -7,10 +7,11 @@ class AtencionesController extends Controller {
      * using two-column layout. See 'protected/views/layouts/column2.php'.
      */
     public $layout = '//layouts/column2';
-    public $_mensaje;
+    public $mensaje;
     public $selectedItem = 'atenciones';
     public $rutPaciente;
     public $rutProfesional;
+    public $idCita;
 
     /**
      * @return array action filters
@@ -30,11 +31,11 @@ class AtencionesController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'nueva', 'cargardiagnosticos', 'editar', 'ver', 'find'),
+                'actions' => array(''),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+                'actions' => array('index', 'view', 'nueva', 'cargardiagnosticos', 'editar', 'ver', 'find'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -52,10 +53,10 @@ class AtencionesController extends Controller {
      * @param integer $id the ID of the model to be displayed
      */
     public function actionVer($id) {
-        echo $id;
-//        $this->render('detalles', array(
-//            'model' => $this->loadModel($id),
-//        ));
+        //echo $id;
+        $this->render('detalles', array(
+            'model' => $this->loadModel($id),
+        ));
     }
 
     /**
@@ -66,30 +67,43 @@ class AtencionesController extends Controller {
         $model = new Atenciones;
 
         $this->rutPaciente = $id;
+        $this->idCita = $_GET['cita'];
 
         $this->performAjaxValidation($model);
-        
+
         if (isset($_POST['Atenciones'])) {
-            
+
             $model->attributes = $_POST['Atenciones'];
-            $model->rut_profesional = '112223334';
+
+            if (isset($_POST['rutPaciente'])) {
+                $model->rut_profesional = $_POST['rutPaciente'];
+            }
+
+            $model->rut_profesional = Yii::app()->user->rut;
             $model->rut_paciente = $this->rutPaciente;
             $model->fecha = date('y-m-d');
 
             if ($model->save()) {
-                $this->forward('atenciones/ver/' . $model->id);
+                $cita = Citas::model()->findByPk($this->idCita);
+                $cita->id_estado_cita = 2;
+                $cita->save(false);
+                $this->mensaje = 'Se ha registrado una nueva atención en el sistema.';
+                $this->forward('index');
             }
         }
 
-        $this->render('nueva', array(
-            'model' => $model,
-        ));
+        if (Yii::app()->user->perfil == 'profesional') {
+            $this->render('nueva', array(
+                'model' => $model,
+            ));
+        }else{
+            throw new CHttpException(401, 'No posee los priviligios para realizar la operación.');
+        }
     }
 
     public function actionCargarDiagnosticos() {
 
-        $data = Diagnosticos::model()->findAll('id_categoria=:idCategoria', 
-                array(':idCategoria' => (int) $_POST['idCategoria']));
+        $data = Diagnosticos::model()->findAll('id_categoria=:idCategoria', array(':idCategoria' => (int) $_POST['idCategoria']));
 
         $data = CHtml::listData($data, 'id', 'diagnostico');
 
@@ -110,9 +124,13 @@ class AtencionesController extends Controller {
         $this->performAjaxValidation($model);
 
         if (isset($_POST['Atenciones'])) {
+
             $model->attributes = $_POST['Atenciones'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+
+            if ($model->save()) {
+                $this->mensaje = 'Se ha registrado una nueva atención en el sistema.';
+                $this->forward('index');
+            }
         }
 
         $this->render('editar', array(
@@ -140,67 +158,50 @@ class AtencionesController extends Controller {
     public function actionIndex() {
 
         $criteria = new CDbCriteria();
-        $count = Atenciones::model()->count($criteria);
-        $pages = new CPagination($count);
 
-        if (isset($_GET['clavePaciente'])) {
-            $q = $_GET['clavePaciente'];
-            $criteria->compare('nombre_1', $q, true, 'OR');
-            $criteria->compare('apellido_paterno', $q, true, 'OR');
-            $criteria->compare('rut', $q, true, 'OR');
+        if (isset($_POST['fDesde'])) {
+            $fDesde = $_POST['fDesde'];
+        } else {
+            $fDesde = '';
         }
 
+        if (isset($_POST['fHasta']) && !empty($_POST['fHasta'])) {
+            $fHasta = $_POST['fHasta'];
+        } else {
+            $fHasta = date('Y-m-d');
+        }
+
+        if (isset($_POST['rutPaciente'])) {
+            $q = $_POST['rutPaciente'];
+            $criteria->compare('rut_paciente', $q, false, 'OR');
+        }
+
+        if (isset($_POST['rutMedico'])) {
+            $q = $_POST['rutMedico'];
+            $criteria->compare('rut_paciente', $q, false, 'OR');
+        }
+
+        if (isset($_POST['idDiagnostico'])) {
+            $criteria->compare('id_diagnostico', $_POST['idDiagnostico'], false, 'OR');
+        }
+
+        $criteria->addBetweenCondition('fecha', $fDesde, $fHasta);
+        $criteria->order = 'fecha DESC';
+//        
+//        echo $_;
+//        Yii::app()->end();
+
+        $count = Atenciones::model()->count($criteria);
+        $pages = new CPagination($count);
         // results per page
-        $pages->pageSize = 5;
+        $pages->pageSize = 10;
         $pages->applyLimit($criteria);
 
-        $profesionales = Atenciones::model()->findAll($criteria);
+        $model = Atenciones::model()->findAll($criteria);
 
-        $this->render('index', array('atenciones' => $profesionales,
+        $this->render('index', array('atenciones' => $model,
             'pages' => $pages,
         ));
-    }
-
-    public function actionFind() {
-
-        $criteria = new CDbCriteria();
-        $count = Atenciones::model()->count($criteria);
-        $pages = new CPagination($count);
-
-        if (isset($_POST)) {
-            print_r($_POST);
-
-            if (isset($_POST['fechaDesde'])) {
-                $criteria->addBetweenCondition('fecha', $_POST['fechaDesde'], date('Y-m-d'));
-            }
-
-            if (isset($_POST['fechaHasta'])) {
-                $criteria->addBetweenCondition('fecha', date('Y-m-d'), $_POST['fechaHasta']);
-            }
-
-//            if(isset($_POST['id_categoria'])){
-//                $criteria->compare('', $pages)
-//            }
-//            
-            if (isset($_POST['id_diagnostico'])) {
-                $criteria->compare('id_diagnostico', $_POST['id_diagnostico']);
-            }
-
-
-//            $criteria->compare('nombre_1', $q, true, 'OR');
-//            $criteria->compare('apellido_paterno', $q, true, 'OR');
-////            $criteria->compare('rut', $q, true, 'OR');
-        }
-
-        // results per page
-        $pages->pageSize = 5;
-        $pages->applyLimit($criteria);
-
-        $profesionales = Atenciones::model()->findAll($criteria);
-
-//        $this->render('index', array('atenciones' => $profesionales,
-//            'pages' => $pages,
-//        ));
     }
 
     /**

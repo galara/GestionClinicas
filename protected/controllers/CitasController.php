@@ -32,7 +32,7 @@ class CitasController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'getcitas','view', 'create', 'editar'),
+                'actions' => array('index', 'getcitas', 'view', 'create', 'editar'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -45,8 +45,8 @@ class CitasController extends Controller {
         );
     }
 
-    private function tipoCitaToEvent($tipo){
-     
+    private function tipoCitaToEvent($tipo) {
+
         switch ($tipo) {
             case 'Normal':
                 $tipo = 'event-info';
@@ -55,11 +55,10 @@ class CitasController extends Controller {
                 $tipo = 'event-warning';
                 break;
         }
-        
+
         return $tipo;
-        
     }
-    
+
     /**
      * @return array retorna un array con las citas obtenidas de la base de datos en
      * formato json para ser usado por el plugin bootstrap-calendar
@@ -71,15 +70,17 @@ class CitasController extends Controller {
         $citas = null;
 
         foreach ($data as $cita) {
-                        
-            $citas[] = array(
-                'id' => $cita->id,
-                'title' => $cita->fkPaciente->nombre_1 . ' ' . $cita->fkPaciente->apellido_paterno,
-                'url' => '/gestionclinicas/citas/' . $cita->id,
-                'class' => $this->tipoCitaToEvent($cita->fkTipoCita->tipo_cita),
-                'start' => (strtotime($cita->hora_inicio) + 18000) . '000',
-                'end' => (strtotime($cita->hora_termino) + 18000). '000'
-            );
+            //echo Yii::app()->user->id;
+            if ($cita->id_estado_cita == 1) {
+                $citas[] = array(
+                    'id' => $cita->id,
+                    'title' => $cita->fkPaciente->nombre_1 . ' ' . $cita->fkPaciente->apellido_paterno,
+                    'url' => '/gestionclinicas/citas/' . $cita->id,
+                    'class' => $this->tipoCitaToEvent($cita->fkTipoCita->tipo_cita),
+                    'start' => (strtotime($cita->hora_inicio)) . '000',
+                    'end' => (strtotime($cita->hora_termino)) . '000'
+                );
+            }
         }
 
         echo json_encode(array('success' => 1, 'result' => $citas));
@@ -106,7 +107,7 @@ class CitasController extends Controller {
 
         if (isset($_POST['Citas'])) {
             $model->attributes = $_POST['Citas'];
-            if ($model->save()){
+            if ($model->save()) {
                 $this->mensaje = 'La cita ha sido agendada correctamente';
                 $this->forward('index');
             }
@@ -129,7 +130,7 @@ class CitasController extends Controller {
 
         if (isset($_POST['Citas'])) {
             $model->attributes = $_POST['Citas'];
-            if ($model->save()){
+            if ($model->save()) {
                 $this->mensaje = 'La cita ha sido modificada correctamente';
                 $this->forward('index');
             }

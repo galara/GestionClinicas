@@ -8,6 +8,16 @@ $this->breadcrumbs = array(
     'Atenciones',
 );
 ?>
+<!-- Mensaje -->
+<?php if (!is_null($this->mensaje)): ?>
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+        </button>
+        <?php echo $this->mensaje ?>
+    </div>
+<?php endif; ?>
+<!-- fin mensaje -->
 <!-- tabla de atenciones -->
 <div class="row col-md-8">
     <h2>Registro de Atenciones</h2>
@@ -20,7 +30,7 @@ $this->breadcrumbs = array(
                     <th>ID</th>
                     <th>Médico</th>
                     <th>Paciente</th>
-                    <th>Diagnóstico</th>
+                    <th>Fecha</th>
                     <th>Ver</th>
                 </tr>
             </thead>
@@ -31,12 +41,12 @@ $this->breadcrumbs = array(
                             <?php echo $atencion->id ?>
                         </td>
                         <td>
-                            <?php echo $atencion->fkProfesional->nombre_1 . ' ' . $atencion->fkProfesional->apellido_paterno . ' ' . $atencion->fkProfesional->apellido_materno ?>
+                            <?php echo  $atencion->fkProfesional->nombre_1 . ' ' . $atencion->fkProfesional->apellido_paterno . ' ' . $atencion->fkProfesional->apellido_materno ?>
                         </td>
                         <td>
                             <?php echo $atencion->fkPaciente->nombre_1 . ' ' . $atencion->fkPaciente->apellido_paterno . ' ' . $atencion->fkPaciente->apellido_materno ?>
                         </td>
-                        <td><?php echo $atencion->fkDiagnostico->diagnostico ?></td>
+                        <td><?php echo date('d/m/Y', strtotime($atencion->fecha))?></td>
                         <td>
                             <a href="<?php echo Yii::app()->createUrl('/atenciones/ver/' . $atencion->id) ?>">
                                 <span class="glyphicon glyphicon-zoom-in"></span>
@@ -73,13 +83,6 @@ $this->breadcrumbs = array(
 
     <?php else: ?>
         <h3>No hay datos para mostrar</h3>
-        <div class="row">
-            <div class="col-lg-12 right">
-                <a href="<?php echo Yii::app()->request->baseUrl; ?>/pacientes/crear" class="btn btn-primary">
-                    <span class="glyphicon glyphicon-plus"></span>&nbsp; Nuevo
-                </a>
-            </div>
-        </div>
     <?php endif; ?>
     <!-- fin listado de pacientes -->
 </div>
@@ -89,7 +92,7 @@ $this->breadcrumbs = array(
     <!-- Formulario de búsqueda -->
     <div class="row">
         <div class="col-md-12">
-            <?php echo CHtml::beginForm(CController::createUrl('Atenciones/Find'), 'POST', array('class' => 'form-horizontal', 'role' => 'form')) ?>
+            <?php echo CHtml::beginForm(CController::createUrl('Atenciones/index'), 'POST', array('class' => 'form-horizontal', 'role' => 'form')) ?>
             <form>
                 <div class="row form-group">
                     <div class="col-md-6">
@@ -100,7 +103,7 @@ $this->breadcrumbs = array(
                     <div class="col-md-12">
                         <label>Desde:</label><br>
                         <div class='input-group date' id='from'>
-                            <?php echo CHtml::textField('fDesde', '', array('class' => 'form-control', 'readonly' => 'readonly', 'id' => 'hasta')) ?>
+                            <?php echo CHtml::textField('fDesde', '', array('class' => 'form-control', 'readonly' => 'readonly', 'id' => 'desde')) ?>
                             <span class="input-group-addon" id="fechaDesde"  >
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
@@ -139,12 +142,12 @@ $this->breadcrumbs = array(
                     <div class="col-md-12">
                         <label>Diagnóstico:</label>
                         <br>
-                        <?php echo CHtml::dropDownList('id_diagnostico', '', array(), array('class' => 'form-control', 'id' => 'diagnosticos')); ?>
+                        <?php echo CHtml::dropDownList('idDiagnostico', '', array(), array('class' => 'form-control', 'id' => 'diagnosticos')); ?>
                     </div>
                 </div>
                 <div class="row form-group">
                     <div class="col-md-12">
-                        <label>Médico</label>
+                        <label>Paciente</label>
                         <div class='input-group'>
                             <?php echo CHtml::textField('rutPaciente', '', array('maxlength' => 12, 'class' => 'form-control', 'id' => 'rutPaciente', 'readonly' => 'readonly')); ?>
                             <span class="input-group-addon" >

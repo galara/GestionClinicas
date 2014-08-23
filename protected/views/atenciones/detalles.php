@@ -44,7 +44,7 @@ $this->breadcrumbs = array(
                 </div>
                 <hr>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label>
                             Síntomas:
                         </label>
@@ -54,7 +54,7 @@ $this->breadcrumbs = array(
                 </div>
                 <hr>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label>
                             Diagnóstico:
                         </label>
@@ -64,7 +64,7 @@ $this->breadcrumbs = array(
                 </div>
                 <hr>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label>
                             Tratamiento Recetado:
                         </label>
@@ -81,8 +81,7 @@ $this->breadcrumbs = array(
             <div class="panel-heading">Operaciones</div>
             <div class="panel-body">
                 <?php
-                echo CHtml::link('Ver todos', '/gestionclinicas/pacientes/') . '<br>';
-                echo CHtml::link('Completar datos clínicos', '/gestionclinicas/') . '<br>';
+                echo CHtml::link('Ver todos', '/gestionclinicas/atenciones/') . '<br>';
                 echo CHtml::link('Volver', Yii::app()->request->urlReferrer);
                 ?>
             </div>

@@ -17,7 +17,8 @@
 
     <?php
     CHtml::$errorContainerTag = 'p';
-    echo $form->errorSummary($model);
+    CHtml::$errorSummaryCss = 'alert alert-warning';
+    echo $form->errorSummary($model, 'Se han detectado los siguienter errores:');
     ?>
 
     <div class="row">

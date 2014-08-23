@@ -36,7 +36,8 @@ class Atenciones extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('rut_paciente, rut_profesional, sintomas, id_diagnostico, fecha', 'required'),
+			array('rut_paciente, rut_profesional, sintomas, id_diagnostico, fecha', 'required', 
+                            'message' => 'El campo {attribute} es obligatorio.'),
 			array('id_diagnostico', 'numerical', 'integerOnly'=>true),
 			array('rut_paciente, rut_profesional', 'length', 'max'=>12),
 			array('sintomas', 'length', 'max'=>1000),
@@ -69,9 +70,9 @@ class Atenciones extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'rut_paciente' => 'Rut Paciente',
-			'rut_profesional' => 'Rut Profesional',
-			'sintomas' => 'Sintomas',
-			'id_diagnostico' => 'Id Diagnostico',
+			'rut_profesional' => 'Rut Médico',
+			'sintomas' => 'Síntomas',
+			'id_diagnostico' => 'Diagnóstico',
 			'tratamiento' => 'Tratamiento',
 			'observaciones' => 'Observaciones',
 			'fecha' => 'Fecha',

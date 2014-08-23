@@ -37,11 +37,16 @@ class Citas extends CActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('hora_inicio, hora_termino, rut_profesional, rut_paciente, id_estado_cita, id_tipo_cita', 'required', 
+            array('hora_inicio, hora_termino, rut_profesional, rut_paciente, id_estado_cita, id_tipo_cita', 'required',
                 'message' => 'El campo {attribute} es obligatorio.'),
             array('id_estado_cita, id_tipo_cita', 'numerical', 'integerOnly' => true),
+            array('hora_inicio', 'validarInicio'),
+            array('hora_termino', 'validarTermino'),
+            //array('hora_inicio', 'horaDisponible'),
             array('rut_profesional, rut_paciente', 'length', 'max' => 10),
             array('motivo', 'length', 'max' => 150),
+            //array('rut_profesional', 'horaDisponible', 'on' => 'insert'),
+            array('hora_termino', 'validarHoras'),
             array('descripcion', 'length', 'max' => 500),
             array('registro', 'safe'),
             // The following rule is used by search().
@@ -123,6 +128,110 @@ class Citas extends CActiveRecord {
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+
+    public function validarHoras($attribute, $params) {
+
+        if ($this->hora_termino <= $this->hora_inicio) {
+            $this->addError($attribute, 'La hora de término debe ser superior a la hora de inicio.');
+        }
+    }
+
+    public function horaDisponible($attribute, $params) {
+
+        $criteria = new CDbCriteria();
+        $criteria->compare('rut_profesional', $this->rut_profesional);
+
+        $citas = Citas::model()->findAll($criteria);
+
+        foreach ($citas as $cita) {
+            if ($this->check_in_range($cita->hora_inicio, $cita->hora_termino, $this->hora_inicio)) {
+                $this->addError($attribute, 'El médico ya posee una cita agendada en ese horario.');
+                break;
+            }
+        }
+    }
+
+    public function validarInicio($attribute, $params) {
+
+        $horaInicio = strtotime(date('Y') . '-' . date('m') . '-' . date('d') . ' 08:30:00');
+        $horaTermino = strtotime(date('Y') . '-' . date('m') . '-' . date('d') . ' 21:00:00');
+
+        if (strtotime($this->hora_inicio) < $horaInicio) {
+            $this->addError($attribute, 'El horario de atención comienza a las 8:30 AM.');
+        } elseif (strtotime($this->hora_inicio) > $horaTermino) {
+            $this->addError($attribute, 'El horario de atención finaliza a las 9:00 PM.');
+        }
+
+        $criteria = new CDbCriteria();
+        $criteria->compare('rut_profesional', $this->rut_profesional);
+
+        $citas = Citas::model()->findAll($criteria);
+
+        foreach ($citas as $cita) {
+            if ($this->isNewRecord) {
+                if ($this->check_in_range($cita->hora_inicio, $cita->hora_termino, $this->hora_inicio)) {
+                    $this->addError($attribute, 'El médico ya posee una cita agendada en ese horario.');
+                    break;
+                }
+            } else {
+                if ($cita->hora_inicio !== $this->hora_inicio) {
+                    if ($this->check_in_range($cita->hora_inicio, $cita->hora_termino, $this->hora_inicio)) {
+                        $this->addError($attribute, 'El médico ya posee una cita agendada en ese horario.');
+                        break;
+                    }
+                }
+            }
+        }
+
+//        echo $fecha . '-' . strtotime($this->hora_inicio) . ' ---' . date('Y') . '-' . date('m') . '-' . date('d') . ' 08:30:00 -this-> ' . $this->hora_inicio . ' -Server ->' .  date('Y-m-d H:i:s');
+    }
+
+    public function validarTermino($attribute, $params) {
+
+        $horaInicio = strtotime(date('Y') . '-' . date('m') . '-' . date('d') . ' 08:30:00');
+        $horaTermino = strtotime(date('Y') . '-' . date('m') . '-' . date('d') . ' 21:00:00');
+
+        if (strtotime($this->hora_termino) < $horaInicio) {
+            $this->addError($attribute, 'El horario de atención comienza a las 8:30 AM.');
+        } elseif (strtotime($this->hora_termino) > $horaTermino) {
+            $this->addError($attribute, 'El horario de atención finaliza a las 9:00 PM.');
+        }
+
+        $criteria = new CDbCriteria();
+        $criteria->compare('rut_profesional', $this->rut_profesional);
+
+        $citas = Citas::model()->findAll($criteria);
+
+        foreach ($citas as $cita) {
+            if ($this->isNewRecord) {
+                if ($this->check_in_range($cita->hora_inicio, $cita->hora_termino, $this->hora_termino)) {
+                    $this->addError($attribute, 'El médico ya posee una cita agendada en ese horario.');
+                    break;
+                }
+            } else {
+                if ($cita->hora_termino !== $this->hora_termino) {
+                    if ($this->check_in_range($cita->hora_inicio, $cita->hora_termino, $this->hora_termino)) {
+                        $this->addError($attribute, 'El médico ya posee una cita agendada en ese horario.');
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Verifica que una fecha esté dentro del rango de fechas establecidas
+     * @param $start_date fecha de inicio
+     * @param $end_date fecha final
+     * @param $evaluame fecha a comparar
+     * @return true si esta en el rango, false si no lo está
+     */
+    private function check_in_range($start_date, $end_date, $evaluame) {
+        $start_ts = strtotime($start_date);
+        $end_ts = strtotime($end_date);
+        $user_ts = strtotime($evaluame);
+        return (($user_ts >= $start_ts) && ($user_ts <= $end_ts));
     }
 
 }
