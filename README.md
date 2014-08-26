@@ -1,7 +1,7 @@
 GestionClinicas
 ===============
 
-Aplicación web basada para el gestion de clínicas médicas
+Aplicación web para el gestion de clínicas médicas
 
 La aplicacion hace uso de los siguientes framework:
 - Bootstrap 3.2.0
@@ -14,11 +14,11 @@ Además hace uso de los siguientes pluggins:
 
 Para instalar la aplicación:
 
-- Copia la carpeta a la carpta htdocs o www de tu servidor.
+- Copia la carpeta del proyecto a la carpeta htdocs o www de tu servidor.
 - Importante: Se requiere una versión PHP 5.2 o superior.
 - Importa la base de datos ubicada en la carpeta /DataBase
 - Configura el archivo main.php ubicada en /protected/config/main.php de acuerdo a las configuraciones de tu servidor.
-- Importante: el archivo requiere del framework Yii no incluido en el proyecto. Una vez lo descargues configura su ubicación en el archivo index-test.php.
+- Importante: el archivo requiere del framework Yii no incluido en el proyecto. Una vez lo descargues configura su ubicación en el archivo index-test.php o index.php en caso de que no lo ejecutes desde un IDE.
 
 Para su importación a NetBeans.
 
