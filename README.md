@@ -16,7 +16,7 @@ Para instalar la aplicación:
 
 - Copia la carpeta del proyecto a la carpeta htdocs o www de tu servidor.
 - Importante: Se requiere una versión PHP 5.2 o superior.
-- Importa la base de datos ubicada en la carpeta /DataBase
+- Importa la base de datos ubicada en el archivo database.sql, ubicado en la raíz del proyecto.
 - Configura el archivo main.php ubicada en /protected/config/main.php de acuerdo a las configuraciones de tu servidor.
 - Importante: el archivo requiere del framework Yii no incluido en el proyecto. Una vez lo descargues configura su ubicación en el archivo index-test.php o index.php en caso de que no lo ejecutes desde un IDE.
 
